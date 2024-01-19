@@ -6,8 +6,12 @@ services:
     restart: no
     ports:
       - target: 80
-        #published: ${NGINX_HTTP:-8098}
+        # published: ${NGINX_HTTP:-8098}
       - target: 443
         published: ${NGINX_HTTPS:-8448}
+    environment:
+      conf: /etc/nginx/conf.d
+      in_docker: true
     volumes:
       - "./conf:/etc/nginx/conf.d:ro"
+      - "./test.sh:/test.sh"

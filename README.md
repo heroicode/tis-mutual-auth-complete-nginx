@@ -18,3 +18,8 @@ Each target can also be run individually, and the scripts can be executed direct
 ./test.sh
 rm ./conf/*.pem
 ```
+
+The test can also be executed inside the container as follows:
+```shell
+docker compose exec nginx sh -c 'NGINX_HTTPS=443 /test.sh'
+```

@@ -3,11 +3,12 @@
 set -o errexit -o nounset -o noclobber
 dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd); cd "$dir"
 conf=${conf:-./conf}
+in_docker=${in_docker:-false}
 
 [ -e "$conf"/client.pem ] || { echo "Missing files. Run ./configure.sh" >&2; exit 3; }
 [ -e ./.env ] && . ./.env
 
-docker compose up --detach
+$in_docker || docker compose up --detach
 
 test() {
     local name=$1 result expected=$2
@@ -43,4 +44,4 @@ test good-any "$expected" \
     --cert "$conf"/client.pem \
     https://localhost:"${NGINX_HTTPS:-8448}"/any
 
-docker compose down
+$in_docker || docker compose down
