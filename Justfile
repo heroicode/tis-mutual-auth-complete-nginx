@@ -30,3 +30,12 @@ set ignore-comments
     command -v openssl
     command -v docker
     command -v curl
+
+[private]
+@docker_all:
+    docker compose create nginx
+    docker compose run --rm nginx sh -c /configure.sh
+    docker compose up --detach
+    docker compose exec nginx sh -c 'NGINX_HTTPS=443 /test.sh'
+    docker compose run --rm nginx sh -c 'rm "$conf"/*.pem'
+    docker compose down

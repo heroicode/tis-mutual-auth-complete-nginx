@@ -19,7 +19,13 @@ Each target can also be run individually, and the scripts can be executed direct
 rm ./conf/*.pem
 ```
 
-The test can also be executed inside the container as follows:
+It's possible to do configuration and testing entirely inside containers.
+Example:
 ```shell
+docker compose create nginx
+docker compose run --rm nginx sh -c /configure.sh
+docker compose up --detach
 docker compose exec nginx sh -c 'NGINX_HTTPS=443 /test.sh'
+docker compose run --rm nginx sh -c 'rm "$conf"/*.pem'
+docker compose down
 ```

@@ -13,5 +13,8 @@ services:
       conf: /etc/nginx/conf.d
       in_docker: true
     volumes:
-      - "./conf:/etc/nginx/conf.d:ro"
+      - "./conf:/etc/nginx/conf.d"
+      - source: ./configure.sh
+        target: /configure.sh
+        type: bind
       - "./test.sh:/test.sh"

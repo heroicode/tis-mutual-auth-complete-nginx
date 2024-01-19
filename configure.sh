@@ -6,14 +6,15 @@ conf=${conf:-./conf}
 cd "$conf"
 
 openssl() {
-    local pem="$1"
+    local command pem="$1"
     [ -e "$pem" ] && return
     shift
     echo "Generating $pem"
     # /usr/local/opt/openssl@3/bin/openssl
-    "$(command -v "${OPENSSL:-/opt/homebrew/bin/openssl}" \
-         || command -v openssl)" \
-        "$@" 2>/dev/null
+    command="$(command -v "${OPENSSL:-/opt/homebrew/bin/openssl}" \
+         || command -v openssl)"
+    [ "$command" = openssl ] && command=/usr/bin/openssl
+    "$command" "$@" 2>/dev/null
 }
 
 # set -x
