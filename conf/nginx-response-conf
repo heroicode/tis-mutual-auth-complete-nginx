@@ -1,0 +1,12 @@
+    location ~ /* {
+        add_header 'Content-Type' 'application/json';
+        # return 200 '{}';
+        set $body "\"dn\":\"$ssl_client_s_dn\"";
+        set $body "$body,\"fingerprint\":\"$ssl_client_fingerprint\"";
+        set $body "$body,\"path\":\"$request_uri\"";
+        return 200 "{$body}";
+    }
+
+    location = /admin {
+        try_files /dev/null @404json;
+    }

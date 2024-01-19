@@ -1,0 +1,17 @@
+    location @400json {
+      default_type application/json;
+      add_header content-type application/json;
+      return 400 '{"message":"$status"}';
+    }
+
+    location @404json {
+      default_type application/json;
+      return 404 '{"message":"Not Found"}';
+    }
+
+    location @495json {
+        default_type application/json;
+        set $message $ssl_client_verify;
+        if ($message ~ '^NONE$') { set $message 'Required SSL certificate not sent'; }
+        return 400 "{\"message\":\"$message\"}";
+    }
