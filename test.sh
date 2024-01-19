@@ -12,7 +12,7 @@ docker compose up --detach
 test() {
     local name=$1 result expected=$2
     shift 2
-    result=$(curl -vsS "$@")
+    result=$(curl -sS "$@")
     # echo "...$result..."
     [ "$expected" = "$result" ] || { echo "unexpected: '$result'"; return 1; }
     echo "$name passed" >&2
