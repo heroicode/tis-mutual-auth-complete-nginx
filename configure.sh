@@ -1,7 +1,9 @@
 #!/usr/bin/env sh
 # shellcheck disable=SC2039  # local keyword is fine, actually
 set -o errexit -o nounset -o noclobber
-dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd); cd "$dir/conf"
+dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd); cd "$dir"
+conf=${conf:-./conf}
+cd "$conf"
 
 openssl() {
     local pem="$1"

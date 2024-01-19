@@ -2,8 +2,9 @@
 # shellcheck disable=SC2039  # local keyword is fine, actually
 set -o errexit -o nounset -o noclobber
 dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd); cd "$dir"
+conf=${conf:-./conf}
 
-[ -e ./conf/client.pem ] || { echo "Missing files. Run ./configure.sh" >&2; exit 3; }
+[ -e "$conf"/client.pem ] || { echo "Missing files. Run ./configure.sh" >&2; exit 3; }
 [ -e ./.env ] && . ./.env
 
 docker compose up --detach
@@ -18,28 +19,28 @@ test() {
 }
 
 true && test no-client-cert '{"message":"Required SSL certificate not sent"}' \
-    --cacert ./conf/root.pem \
-    `#--cert ./conf/client.pem` \
+    --cacert "$conf"/root.pem \
+    `#--cert "$conf"/client.pem` \
     https://localhost:"${NGINX_HTTPS:-8448}"
 
 true && test bad-client '{"message":"FAILED:self-signed certificate"}' \
-    --cacert ./conf/root.pem \
-    --cert ./conf/bad-client.pem \
+    --cacert "$conf"/root.pem \
+    --cert "$conf"/bad-client.pem \
     https://localhost:"${NGINX_HTTPS:-8448}"
 
 test not-found '{"message":"Not Found"}' \
-    --cacert ./conf/root.pem \
-    --cert ./conf/client.pem \
+    --cacert "$conf"/root.pem \
+    --cert "$conf"/client.pem \
     https://localhost:"${NGINX_HTTPS:-8448}"/admin
 
-fingerprint=$(openssl x509 -noout -fingerprint -sha1 -in ./conf/client.pem \
+fingerprint=$(openssl x509 -noout -fingerprint -sha1 -in "$conf"/client.pem \
     | awk -F= '{ gsub(":","",$2); print tolower($2); }')
 
 expected='{"dn":"CN=http client,OU=Local,O=Dev,L=Any,ST=ZZ,C=US","fingerprint":"'"$fingerprint"'","path":"/any"}'
 # echo "$expected"
 test good-any "$expected" \
-    --cacert ./conf/root.pem \
-    --cert ./conf/client.pem \
+    --cacert "$conf"/root.pem \
+    --cert "$conf"/client.pem \
     https://localhost:"${NGINX_HTTPS:-8448}"/any
 
 docker compose down
