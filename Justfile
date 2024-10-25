@@ -16,6 +16,12 @@ set ignore-comments
     -CAfile ./conf/root.pem \
     -cert ./conf/client.pem
 
+@curl:
+    { curl -sSf --cert ./conf/client.pem --cacert ./conf/root.pem \
+        "https://localhost:${NGINX_HTTPS:-8448}/test" ; echo ; } \
+    | tee /dev/stderr \
+    | grep -Eq '^[{]"dn":"CN=http client,OU=Local,O=Dev,.+"path":"/test"[}]$'
+
 # generate certificates
 @configure:
     ./configure.sh
