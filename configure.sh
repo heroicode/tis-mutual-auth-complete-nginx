@@ -19,11 +19,21 @@ openssl() {
 
 # set -x
 
+openssl unused-root.pem req -nodes -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 \
+    -days 1 \
+    -text -keyout unused-root.pem -out unused-root.pem \
+    -subj "/C=US/ST=ZZ/L=Any/O=Dev/OU=Local/CN=localhost unused CA" \
+    -addext keyUsage=critical,nonRepudiation,cRLSign,keyCertSign \
+    -addext basicConstraints=critical,CA:TRUE \
+    -addext nsComment="Unused CA root" \
+
 openssl root.pem req -nodes -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 \
     -days 3650 \
     -text -keyout root.pem -out root.pem \
     -subj "/C=US/ST=ZZ/L=Any/O=Dev/OU=Local/CN=localhost CA" \
     -addext keyUsage=critical,nonRepudiation,cRLSign,keyCertSign \
+    -addext basicConstraints=critical,CA:TRUE \
+    -addext nsComment="CA root" \
 
 openssl https.pem req -nodes -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 \
     -days 3650 \
@@ -32,6 +42,7 @@ openssl https.pem req -nodes -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384
     -subj "/C=US/ST=ZZ/L=Any/O=Dev/OU=Local/CN=localhost" \
     -addext "subjectAltName=DNS:localhost,DNS:*.localhost,IP:127.0.0.1" \
     -addext basicConstraints=critical,CA:FALSE \
+    -addext nsComment="HTTP proxy server" \
 
 # -new seems to be implied but we use it anyway
 openssl client.pem req -nodes -x509 -days 750 -sha256 -new \
