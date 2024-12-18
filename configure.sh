@@ -35,10 +35,19 @@ openssl root.pem req -nodes -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r
     -addext basicConstraints=critical,CA:TRUE \
     -addext nsComment="CA root" \
 
+openssl intermediate.pem req -nodes -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 \
+    -days 3650 \
+    -text -keyout intermediate.pem -out intermediate.pem \
+    -CA root.pem -key root.pem \
+    -subj "/C=US/ST=ZZ/L=Any/O=Dev/OU=Local/CN=intermediate CA" \
+    -addext keyUsage=critical,nonRepudiation,cRLSign,keyCertSign \
+    -addext basicConstraints=critical,CA:TRUE \
+    -addext nsComment="CA intermediate" \
+
 openssl https.pem req -nodes -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 \
     -days 3650 \
     -text -keyout https.pem -out https.pem \
-    -CA root.pem -key root.pem \
+    -CA intermediate.pem -key intermediate.pem \
     -subj "/C=US/ST=ZZ/L=Any/O=Dev/OU=Local/CN=localhost" \
     -addext "subjectAltName=DNS:localhost,DNS:*.localhost,IP:127.0.0.1" \
     -addext basicConstraints=critical,CA:FALSE \
@@ -47,7 +56,7 @@ openssl https.pem req -nodes -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384
 # -new seems to be implied but we use it anyway
 openssl client.pem req -nodes -x509 -days 750 -sha256 -new \
     -text -keyout client.pem -out client.pem \
-    -CA root.pem -key root.pem \
+    -CA intermediate.pem -key intermediate.pem \
     -subj "/C=US/ST=ZZ/L=Any/O=Dev/OU=Local/CN=http client" \
     -addext "subjectAltName=DNS:localhost,DNS:*.localhost,IP:127.0.0.1" \
     -addext basicConstraints=critical,CA:FALSE \
@@ -71,5 +80,5 @@ openssl bad-client.pem req -nodes -x509 -days 750 -sha256 -new \
     -addext nsComment="Local Test Client Certificate" \
 
 
-
+[ -e chain.pem ] || cat intermediate.pem root.pem > chain.pem
 
